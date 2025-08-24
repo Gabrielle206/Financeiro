@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Financeiro Pessoal</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu button {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .saldo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: var(--light);
+            border-radius: 8px;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        .user-info {
+            text-align: right;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Controle Financeiro Pessoal</h1>
+    </header>
+
+    <div id="loginSection" class="card">
+        <h2 class="card-title">Login</h2>
+        <div id="loginAlert" class="alert hidden"></div>
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" placeholder="Seu e-mail">
+        </div>
+        <div class="form-group">
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" placeholder="Sua senha">
+        </div>
+        <button id="btnLogin" class="btn-success">Entrar</button>
+        <p style="margin-top: 20px;">
+            Não tem uma conta? <a href="#" id="linkCadastro">Cadastre-se aqui</a>
+        </p>
+    </div>
+
+    <div id="cadastroSection" class="card hidden">
+        <h2 class="card-title">Cadastro de Usuário</h2>
+        <div id="cadastroAlert" class="alert hidden"></div>
+        <div class="form-group">
+            <label for="cadastroEmail">E-mail:</label>
+            <input type="email" id="cadastroEmail" placeholder="Seu e-mail">
+        </div>
+        <div class="form-group">
+            <label for="cadastroSenha">Senha:</label>
+            <input type="password" id="cadastroSenha" placeholder="Crie uma senha">
+        </div>
+        <div class="form-group">
+            <label for="confirmarSenha">Confirmar Senha:</label>
+            <input type="password" id="confirmarSenha" placeholder="Repita a senha">
+        </div>
+        <button id="btnCadastro" class="btn-success">Cadastrar</button>
+        <p style="margin-top: 20px;">
+            Já tem uma conta? <a href="#" id="linkLogin">Faça login aqui</a>
+        </p>
+    </div>
+
+    <div id="mainSection" class="hidden">
+        <div class="user-info">
+            Usuário: <span id="userEmail"></span> |
+            <a href="#" id="linkLogout">Sair</a>
+        </div>
+
+        <div class="menu">
+            <button id="btnReceita">Nova Receita</button>
+            <button id="btnDespesa">Nova Despesa</button>
+            <button id="btnSaldo">Ver Saldo</button>
+            <button id="btnHistReceita">Histórico de Receitas</button>
+            <button id="btnHistDespesa">Histórico de Despesas</button>
+        </div>
+
+        <div id="alertArea" class="alert hidden"></div>
+
+        <div id="receitaSection" class="card hidden">
+            <h2 class="card-title">Nova Receita</h2>
+            <div class="form-group">
+                <label for="receitaCategoria">Categoria:</label>
+                <select id="receitaCategoria">
+                    <option value="Salario">Salário</option>
+                    <option value="Vendas">Vendas</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="receitaValor">Valor (R$):</label>
+                <input type="number" id="receitaValor" step="0.01" min="0" placeholder="0,00">
+            </div>
+            <div class="form-group">
+                <label for="receitaData">Data:</label>
+                <input type="date" id="receitaData">
+            </div>
+            <button id="btnAddReceita" class="btn-success">Adicionar Receita</button>
+        </div>
+
+        <div id="despesaSection" class="card hidden">
+            <h2 class="card-title">Nova Despesa</h2>
+            <div class="form-group">
+                <label for="despesaCategoria">Categoria:</label>
+                <select id="despesaCategoria">
+                    <option value="Alimentacao">Alimentação</option>
+                    <option value="E-commerce">E-commerce</option>
+                    <option value="Viagens">Viagens</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="despesaValor">Valor (R$):</label>
+                <input type="number" id="despesaValor" step="0.01" min="0" placeholder="0,00">
+            </div>
+            <div class="form-group">
+                <label for="despesaPagamento">Forma de Pagamento:</label>
+                <select id="despesaPagamento">
+                    <option value="Pix">Pix</option>
+                    <option value="Credito">Crédito</option>
+                    <option value="Debito">Débito</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="despesaData">Data:</label>
+                <input type="date" id="despesaData">
+            </div>
+            <button id="btnAddDespesa" class="btn-success">Adicionar Despesa</button>
+        </div>
+
+        <div id="saldoSection" class="card hidden">
+            <h2 class="card-title">Saldo Atual</h2>
+            <div id="saldoValue" class="saldo">Carregando...</div>
+        </div>
+
+        <div id="historicoReceitaSection" class="card hidden">
+            <h2 class="card-title">Histórico de Receitas</h2>
+            <table id="tabelaReceitas">
+                <thead>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Valor (R$)</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="historicoDespesaSection" class="card hidden">
+            <h2 class="card-title">Histórico de Despesas</h2>
+            <table id="tabelaDespesas">
+                <thead>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Valor (R$)</th>
+                    <th>Forma de Pagamento</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Estado da aplicação
+    const state = {
+        loggedIn: false,
+        currentUser: null,
+        currentSection: 'login'
+    };
+
+    // Elementos da interface
+    const elements = {
+        loginSection: document.getElementById('loginSection'),
+        cadastroSection: document.getElementById('cadastroSection'),
+        mainSection: document.getElementById('mainSection'),
+        receitaSection: document.getElementById('receitaSection'),
+        despesaSection: document.getElementById('despesaSection'),
+        saldoSection: document.getElementById('saldoSection'),
+        historicoReceitaSection: document.getElementById('historicoReceitaSection'),
+        historicoDespesaSection: document.getElementById('historicoDespesaSection'),
+        alertArea: document.getElementById('alertArea'),
+        loginAlert: document.getElementById('loginAlert'),
+        cadastroAlert: document.getElementById('cadastroAlert'),
+        userEmail: document.getElementById('userEmail'),
+        saldoValue: document.getElementById('saldoValue')
+    };
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar data atual nos campos de data
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('receitaData').value = today;
+        document.getElementById('despesaData').value = today;
+
+        // Verificar se há usuário logado (simulação)
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            state.loggedIn = true;
+            state.currentUser = JSON.parse(savedUser);
+            showMainSection();
+        }
+
+        // Configurar event listeners
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Links de navegação
+        document.getElementById('linkCadastro').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('cadastro');
+        });
+
+        document.getElementById('linkLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('login');
+        });
+
+        document.getElementById('linkLogout').addEventListener('click', function(e) {
+            e.preventDefault();
+            logout();
+        });
+
+        // Botões de login e cadastro
+        document.getElementById('btnLogin').addEventListener('click', login);
+        document.getElementById('btnCadastro').addEventListener('click', cadastro);
+
+        // Botões do menu principal
+        document.getElementById('btnReceita').addEventListener('click', function() {
+            showSection('receita');
+        });
+
+        document.getElementById('btnDespesa').addEventListener('click', function() {
+            showSection('despesa');
+        });
+
+        document.getElementById('btnSaldo').addEventListener('click', function() {
+            showSection('saldo');
+            calcularSaldo();
+        });
+
+        document.getElementById('btnHistReceita').addEventListener('click', function() {
+            showSection('historicoReceita');
+            carregarHistoricoReceitas();
+        });
+
+        document.getElementById('btnHistDespesa').addEventListener('click', function() {
+            showSection('historicoDespesa');
+            carregarHistoricoDespesas();
+        });
+
+        // Botões de ação
+        document.getElementById('btnAddReceita').addEventListener('click', adicionarReceita);
+        document.getElementById('btnAddDespesa').addEventListener('click', adicionarDespesa);
+    }
+
+    function showSection(section) {
+        // Esconder todas as seções
+        elements.loginSection.classList.add('hidden');
+        elements.cadastroSection.classList.add('hidden');
+        elements.mainSection.classList.add('hidden');
+        elements.receitaSection.classList.add('hidden');
+        elements.despesaSection.classList.add('hidden');
+        elements.saldoSection.classList.add('hidden');
+        elements.historicoReceitaSection.classList.add('hidden');
+        elements.historicoDespesaSection.classList.add('hidden');
+
+        // Mostrar a seção solicitada
+        if (section === 'login') {
+            elements.loginSection.classList.remove('hidden');
+        } else if (section === 'cadastro') {
+            elements.cadastroSection.classList.remove('hidden');
+        } else if (section === 'main') {
+            elements.mainSection.classList.remove('hidden');
+        } else if (section === 'receita') {
+            elements.mainSection.classList.remove('hidden');
+            elements.receitaSection.classList.remove('hidden');
+        } else if (section === 'despesa') {
+            elements.mainSection.classList.remove('hidden');
+            elements.despesaSection.classList.remove('hidden');
+        } else if (section === 'saldo') {
+            elements.mainSection.classList.remove('hidden');
+            elements.saldoSection.classList.remove('hidden');
+        } else if (section === 'historicoReceita') {
+            elements.mainSection.classList.remove('hidden');
+            elements.historicoReceitaSection.classList.remove('hidden');
+        } else if (section === 'historicoDespesa') {
+            elements.mainSection.classList.remove('hidden');
+            elements.historicoDespesaSection.classList.remove('hidden');
+        }
+
+        state.currentSection = section;
+    }
+
+    function showMainSection() {
+        elements.userEmail.textContent = state.currentUser.email;
+        showSection('main');
+    }
+
+    function showAlert(message, type, element = elements.alertArea) {
+        element.textContent = message;
+        element.classList.remove('hidden', 'alert-success', 'alert-danger');
+        element.classList.add(`alert-${type}`);
+
+        // Auto-esconder alertas após 5 segundos
+        setTimeout(() => {
+            element.classList.add('hidden');
+        }, 5000);
+    }
+
+    function login() {
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        if (!email || !senha) {
+            showAlert('Preencha todos os campos', 'danger', elements.loginAlert);
+            return;
+        }
+
+        // Simulação de login - em um sistema real, isso seria uma requisição ao backend
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.email === email && u.senha === senha);
+
+        if (user) {
+            state.loggedIn = true;
+            state.currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            showMainSection();
+            showAlert('Login realizado com sucesso!', 'success');
+        } else {
+            showAlert('E-mail ou senha incorretos', 'danger', elements.loginAlert);
+        }
+    }
+
+    function cadastro() {
+        const email = document.getElementById('cadastroEmail').value;
+        const senha = document.getElementById('cadastroSenha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+        if (!email || !senha || !confirmarSenha) {
+            showAlert('Preencha todos os campos', 'danger', elements.cadastroAlert);
+            return;
+        }
+
+        if (senha !== confirmarSenha) {
+            showAlert('As senhas não coincidem', 'danger', elements.cadastroAlert);
+            return;
+        }
+
+        // Verificar se usuário já existe
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        if (users.some(u => u.email === email)) {
+            showAlert('Este e-mail já está cadastrado', 'danger', elements.cadastroAlert);
+            return;
+        }
+
+        // Adicionar novo usuário
+        const newUser = {
+            id: Date.now(), // ID único baseado no timestamp
+            email: email,
+            senha: senha
+        };
+
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+
+        showAlert('Cadastro realizado com sucesso! Faça login para continuar.', 'success', elements.cadastroAlert);
+        showSection('login');
+    }
+
+    function logout() {
+        state.loggedIn = false;
+        state.currentUser = null;
+        localStorage.removeItem('currentUser');
+        showSection('login');
+
+        // Limpar campos de login
+        document.getElementById('email').value = '';
+        document.getElementById('senha').value = '';
+    }
+
+    function adicionarReceita() {
+        const categoria = document.getElementById('receitaCategoria').value;
+        const valor = parseFloat(document.getElementById('receitaValor').value);
+        const data = document.getElementById('receitaData').value;
+
+        if (!categoria || isNaN(valor) || valor <= 0 || !data) {
+            showAlert('Preencha todos os campos corretamente', 'danger');
+            return;
+        }
+
+        // Obter receitas existentes
+        const receitas = JSON.parse(localStorage.getItem('receitas') || '[]');
+
+        // Adicionar nova receita
+        const novaReceita = {
+            id: Date.now(),
+            categoria: categoria,
+            valor: valor,
+            data: data,
+            id_usuario: state.currentUser.id
+        };
+
+        receitas.push(novaReceita);
+        localStorage.setItem('receitas', JSON.stringify(receitas));
+
+        showAlert('Receita adicionada com sucesso!', 'success');
+
+        // Limpar formulário
+        document.getElementById('receitaValor').value = '';
+    }
+
+    function adicionarDespesa() {
+        const categoria = document.getElementById('despesaCategoria').value;
+        const valor = parseFloat(document.getElementById('despesaValor').value);
+        const forma_pagamento = document.getElementById('despesaPagamento').value;
+        const data = document.getElementById('despesaData').value;
+
+        if (!categoria || isNaN(valor) || valor <= 0 || !forma_pagamento || !data) {
+            showAlert('Preencha todos os campos corretamente', 'danger');
+            return;
+        }
+
+        // Obter despesas existentes
+        const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
+        // Adicionar nova despesa
+        const novaDespesa = {
+            id: Date.now(),
+            categoria: categoria,
+            valor: valor,
+            forma_pagamento: forma_pagamento,
+            data: data,
+            id_usuario: state.currentUser.id
+        };
+
+        despesas.push(novaDespesa);
+        localStorage.setItem('despesas', JSON.stringify(despesas));
+
+        showAlert('Despesa adicionada com sucesso!', 'success');
+
+        // Limpar formulário
+        document.getElementById('despesaValor').value = '';
+    }
+
+    function calcularSaldo() {
+        // Obter receitas do usuário atual
+        const receitas = JSON.parse(localStorage.getItem('receitas') || '[]');
+        const receitasUsuario = receitas.filter(r => r.id_usuario === state.currentUser.id);
+        const totalReceitas = receitasUsuario.reduce((sum, item) => sum + item.valor, 0);
+
+        // Obter despesas do usuário atual
+        const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+        const despesasUsuario = despesas.filter(d => d.id_usuario === state.currentUser.id);
+        const totalDespesas = despesasUsuario.reduce((sum, item) => sum + item.valor, 0);
+
+        // Calcular saldo
+        const saldo = totalReceitas - totalDespesas;
+
+        // Exibir saldo
+        elements.saldoValue.textContent = `R$ ${saldo.toFixed(2)}`;
+        elements.saldoValue.className = 'saldo ' + (saldo >= 0 ? 'positive' : 'negative');
+    }
+
+    function carregarHistoricoReceitas() {
+        const tabela = document.getElementById('tabelaReceitas').querySelector('tbody');
+        tabela.innerHTML = '';
+
+        // Obter receitas do usuário atual
+        const receitas = JSON.parse(localStorage.getItem('receitas') || '[]');
+        const receitasUsuario = receitas.filter(r => r.id_usuario === state.currentUser.id);
+
+        if (receitasUsuario.length === 0) {
+            tabela.innerHTML = '<tr><td colspan="3" style="text-align: center;">Nenhuma receita encontrada</td></tr>';
+            return;
+        }
+
+        // Ordenar por data (mais recente primeiro)
+        receitasUsuario.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+        // Preencher tabela
+        receitasUsuario.forEach(receita => {
+            const row = tabela.insertRow();
+            row.insertCell(0).textContent = receita.categoria;
+            row.insertCell(1).textContent = receita.valor.toFixed(2);
+            row.insertCell(2).textContent = formatarData(receita.data);
+        });
+    }
+
+    function carregarHistoricoDespesas() {
+        const tabela = document.getElementById('tabelaDespesas').querySelector('tbody');
+        tabela.innerHTML = '';
+
+        // Obter despesas do usuário atual
+        const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+        const despesasUsuario = despesas.filter(d => d.id_usuario === state.currentUser.id);
+
+        if (despesasUsuario.length === 0) {
+            tabela.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma despesa encontrada</td></tr>';
+            return;
+        }
+
+        // Ordenar por data (mais recente primeiro)
+        despesasUsuario.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+        // Preencher tabela
+        despesasUsuario.forEach(despesa => {
+            const row = tabela.insertRow();
+            row.insertCell(0).textContent = despesa.categoria;
+            row.insertCell(1).textContent = despesa.valor.toFixed(2);
+            row.insertCell(2).textContent = despesa.forma_pagamento;
+            row.insertCell(3).textContent = formatarData(despesa.data);
+        });
+    }
+
+    function formatarData(dataStr) {
+        const data = new Date(dataStr);
+        return data.toLocaleDateString('pt-BR');
+    }
+</script>
+</body>
+</html>
